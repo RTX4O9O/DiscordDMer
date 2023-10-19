@@ -25,11 +25,12 @@ public class Main extends ListenerAdapter {
     public void onGuildReady(GuildReadyEvent event) {
         System.out.println("All members in the guild " + event.getGuild().getName() + " have been downloaded.");
         String quitStr;
-        do{
-            sendPrivateMessage();
-            Scanner quit = new Scanner(System.in);
-            quitStr = quit.nextLine();
-        } while (!quitStr.equals("!quit"));
+        sendPrivateMessage();
+        Scanner quit = new Scanner(System.in);
+        quitStr = quit.nextLine();
+/*        for(int i=0 ; i == -1 ; i++){
+
+        }*/
     }
 
     private void sendPrivateMessage() {
