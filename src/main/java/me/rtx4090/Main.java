@@ -77,7 +77,7 @@ public class Main extends ListenerAdapter {
             System.out.printf("Message has been sent to %#s successfully\n", user);
         } else {
             System.out.printf("Message failed to sent to %#s\n", user);
-            sentMessage.getFailure().printStackTrace();
+            System.out.println(sentMessage.getFailure().toString());
         }
     }
 
