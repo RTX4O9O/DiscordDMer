@@ -7,7 +7,6 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.PrivateChannel;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.requests.ErrorResponse;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.Result;
 import java.util.List;
@@ -26,13 +25,15 @@ public class Main extends ListenerAdapter {
                 .addEventListeners(this)
                 .enableIntents(GatewayIntent.GUILD_MEMBERS)
                 .build();
-        try{
-            jda.awaitReady();
-            sendPrivateMessage();
-        }catch(Exception e) {
-            e.printStackTrace();
+        while (true) {
+            try{
+                jda.awaitReady();
+                sendPrivateMessage();
+                //dm();
+            }catch(Exception e) {
+                e.printStackTrace();
+            }
         }
-        jda.shutdownNow();
     }
 
     public static void main(String[] args) {
@@ -66,7 +67,6 @@ public class Main extends ListenerAdapter {
 
         if (result.isFailure()) {
             System.out.println("Channel creation for %#s failed!");
-            String error;
             result.getFailure();
             return;
         }
@@ -81,14 +81,8 @@ public class Main extends ListenerAdapter {
             System.out.println(sentMessage.getFailure().toString());
         }
     }
-
-
-
-
-
-
-
-    private void loop(Scanner scanner) {
+    private void dm(Scanner scanner) {
+        Scanner scanner = new Scanner(System.in);
         System.out.print("User ID: ");
         String recipientUserId = scanner.nextLine();
         System.out.print("Message: ");
