@@ -1,12 +1,16 @@
 package me.rtx4090;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.PrivateChannel;
 import net.dv8tion.jda.api.events.guild.GuildReadyEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.requests.GatewayIntent;
 // import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 
@@ -18,7 +22,10 @@ public class Main extends ListenerAdapter {
 
         System.out.print("Discord Bot Token: ");
         String botToken = scanner.nextLine();
-        jda = JDABuilder.createDefault(botToken).addEventListeners(this).build();
+        jda = JDABuilder.createDefault(botToken)
+                .addEventListeners(this)
+                .enableIntents(GatewayIntent.GUILD_MEMBERS)
+                .build();
     }
 
     public static void main(String[] args) {
@@ -65,4 +72,36 @@ public class Main extends ListenerAdapter {
             System.out.println("Channel creation for %#s failed!");
         }
     }
+
+    private void spamAllGuildMembers(long guildID) {
+        Guild guild = jda.getGuildById(guildID);
+        if (guild == null) return;
+
+        List<Member> members = guild.loadMembers().get();
+        for (Member member : members) {
+            User user = member.getUser();
+            spamUserPrivateChannel(user);
+        }
+
+    }
+
+    private void spamUserPrivateChannel(User user) {
+        if (user.isBot()) return;
+        
+        PrivateChannel channel = jda.openPrivateChannelById(user.getId()).completeAfter(1, TimeUnit.SECONDS);
+        // waits for channel creation, and timeout after 1 second
+        if (channel != null) {
+            Message sentMessage = channel.sendMessage("abcabcabc").completeAfter(1, TimeUnit.SECONDS);
+            // waits for message to send, and timeout after 1 second
+            if (sentMessage == null) {
+                System.out.printf("Message failed to sent to %#s\n", user);
+            } else {
+                System.out.printf("Message has been sent to %#s successfully\n", user);
+            }
+
+        } else {
+            System.out.println("Channel creation for %#s failed!");
+        }
+    }
+
 }
