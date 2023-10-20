@@ -4,6 +4,8 @@ import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.events.guild.GuildReadyEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.entities.User;
+
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Main extends ListenerAdapter {
@@ -26,27 +28,45 @@ public class Main extends ListenerAdapter {
         System.out.println("All members in the guild " + event.getGuild().getName() + " have been downloaded.");
         String quitStr;
         sendPrivateMessage();
-        Scanner quit = new Scanner(System.in);
-        quitStr = quit.nextLine();
-/*        for(int i=0 ; i == -1 ; i++){
-
-        }*/
     }
 
     private void sendPrivateMessage() {
+        boolean sent = false;
+        ArrayList<String> messageContent = new ArrayList<>();
         Scanner scanner = new Scanner(System.in);
         System.out.print("User ID: ");
         String recipientUserId = scanner.nextLine();
-
         System.out.print("Message: ");
-        String messageContent = scanner.nextLine();
+        messageContent.add(scanner.nextLine());
 
         jda.openPrivateChannelById(recipientUserId).queue(channel -> {
             User user = channel.getUser();
-            channel.sendMessage(messageContent).queue();
+            channel.sendMessage(messageContent.get(messageContent.size()-1)).queue();
             System.out.printf("Message has been sent to %#s successfully\n", user);
+            //sent = true;
+
+
         });
+        while (true) {
+            while (sent){
+
+                System.out.print("User ID: ");
+                recipientUserId = scanner.nextLine();
+
+                System.out.print("Message: ");
+                messageContent = scanner.nextLine();
+
+                String finalMessageContent = messageContent;
+                jda.openPrivateChannelById(recipientUserId).queue(channel -> {
+                    User user = channel.getUser();
+                    channel.sendMessage(finalMessageContent).queue();
+                    System.out.printf("Message has been sent to %#s successfully\n", user);
+                    //sent = true;
+                });
+
+            }
+        }
+
 
     }
-
 }
