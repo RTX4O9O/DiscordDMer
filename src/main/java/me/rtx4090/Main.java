@@ -32,6 +32,7 @@ public class Main extends ListenerAdapter {
         }catch(Exception e) {
             e.printStackTrace();
         }
+        jda.shutdownNow();
     }
 
     public static void main(String[] args) {
@@ -97,7 +98,6 @@ public class Main extends ListenerAdapter {
         // waits for channel creation, and timeout after 1 second
         if (result.isFailure()) {
             System.out.println("Channel creation for %#s failed!");
-            result.getFailure().printStackTrace();
             return;
         }
 
