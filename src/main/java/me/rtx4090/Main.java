@@ -5,11 +5,11 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.PrivateChannel;
-import net.dv8tion.jda.api.events.guild.GuildReadyEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.requests.ErrorResponse;
 import net.dv8tion.jda.api.requests.GatewayIntent;
-// import java.util.ArrayList;
+import net.dv8tion.jda.api.utils.Result;
 import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
@@ -26,25 +26,63 @@ public class Main extends ListenerAdapter {
                 .addEventListeners(this)
                 .enableIntents(GatewayIntent.GUILD_MEMBERS)
                 .build();
+        try{
+            jda.awaitReady();
+            sendPrivateMessage();
+        }catch(Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public static void main(String[] args) {
         new Main();
     }
 
-    @Override
-    public void onGuildReady(GuildReadyEvent event) {
-        System.out.println("All members in the guild " + event.getGuild().getName() + " have been downloaded.");
-        sendPrivateMessage();
-    }
-
     private void sendPrivateMessage() {
         Scanner scanner = new Scanner(System.in);
+        System.out.print("Guild ID: ");
+        String guildId = scanner.nextLine();
+        System.out.println();
+        spamAllGuildMembers(guildId);
+    }
 
-        while (true) {
-            loop(scanner);
+    private void spamAllGuildMembers(String guildID) {
+        Guild guild = jda.getGuildById(guildID);
+        if (guild == null) return;
+
+        List<Member> members = guild.loadMembers().get();
+        for (Member member : members) {
+            User user = member.getUser();
+            spamUserPrivateChannel(user);
         }
     }
+
+    private void spamUserPrivateChannel(User user) {
+        if (user.isBot()) return;
+        
+        PrivateChannel channel = jda.openPrivateChannelById(user.getId()).completeAfter(1, TimeUnit.SECONDS);
+        // waits for channel creation, and timeout after 1 second
+
+        if (result.isFailure()) {
+            System.out.println("Channel creation for %#s failed!");
+            String error;
+            result.getFailure();
+            return;
+        }
+
+        PrivateChannel channel = result.get();
+        Result<Message> sentMessage = channel.sendMessage("abcabcabc").mapToResult().completeAfter(1, TimeUnit.SECONDS);
+        // waits for message to send, and timeout after 1 second
+        if (sentMessage.isSuccess()) {
+            System.out.printf("Message has been sent to %#s successfully\n", user);
+        } else {
+            System.out.printf("Message failed to sent to %#s\n", user);
+            sentMessage.getFailure().printStackTrace();
+        }
+    }
+
+
+
 
 
 
@@ -55,53 +93,24 @@ public class Main extends ListenerAdapter {
         System.out.print("Message: ");
         String messageContent = scanner.nextLine();
 
-        PrivateChannel channel = jda.openPrivateChannelById(recipientUserId).completeAfter(1, TimeUnit.SECONDS);
+        Result<PrivateChannel> result = jda.openPrivateChannelById(recipientUserId).mapToResult().completeAfter(1, TimeUnit.SECONDS);
         // waits for channel creation, and timeout after 1 second
-        if (channel != null) {
-
-            User user = channel.getUser();
-            Message sentMessage = channel.sendMessage(messageContent).completeAfter(1, TimeUnit.SECONDS);
-            // waits for message to send, and timeout after 1 second
-            if (sentMessage == null) {
-                System.out.printf("Message failed to sent to %#s\n", user);
-            } else {
-                System.out.printf("Message has been sent to %#s successfully\n", user);
-            }
-
-        } else {
+        if (result.isFailure()) {
             System.out.println("Channel creation for %#s failed!");
-        }
-    }
-
-    private void spamAllGuildMembers(long guildID) {
-        Guild guild = jda.getGuildById(guildID);
-        if (guild == null) return;
-
-        List<Member> members = guild.loadMembers().get();
-        for (Member member : members) {
-            User user = member.getUser();
-            spamUserPrivateChannel(user);
+            result.getFailure().printStackTrace();
+            return;
         }
 
-    }
+        PrivateChannel channel = result.get();
 
-    private void spamUserPrivateChannel(User user) {
-        if (user.isBot()) return;
-        
-        PrivateChannel channel = jda.openPrivateChannelById(user.getId()).completeAfter(1, TimeUnit.SECONDS);
-        // waits for channel creation, and timeout after 1 second
-        if (channel != null) {
-            Message sentMessage = channel.sendMessage("abcabcabc").completeAfter(1, TimeUnit.SECONDS);
-            // waits for message to send, and timeout after 1 second
-            if (sentMessage == null) {
-                System.out.printf("Message failed to sent to %#s\n", user);
-            } else {
-                System.out.printf("Message has been sent to %#s successfully\n", user);
-            }
-
+        User user = channel.getUser();
+        Result<Message> sentMessageResult = channel.sendMessage(messageContent).mapToResult().completeAfter(1, TimeUnit.SECONDS);
+        // waits for message to send, and timeout after 1 second
+        if (sentMessageResult.isSuccess()) {
+            System.out.printf("Message has been sent to %#s successfully\n", user);
         } else {
-            System.out.println("Channel creation for %#s failed!");
+            System.out.printf("Message failed to sent to %#s\n", user);
+            sentMessageResult.getFailure().printStackTrace();
         }
     }
-
 }
