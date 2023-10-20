@@ -32,35 +32,11 @@ public class Main extends ListenerAdapter {
     }
 
     private void sendPrivateMessage() {
-//        boolean sent = false;
-//        final ArrayList<String> messageContent = new ArrayList<>();
         Scanner scanner = new Scanner(System.in);
 
         while (true) {
             loop(scanner);
         }
-
-//        do{
-//            sent = false;
-//
-//            System.out.print("User ID: ");
-//            String recipientUserId = scanner.nextLine();
-//
-//            System.out.print("Message: ");
-//            messageContent.add(scanner.nextLine());
-//
-//            PrivateChannel channel = jda.openPrivateChannelById(recipientUserId).completeAfter(1, TimeUnit.SECONDS);
-//            if (channel!= null) {
-//                User user = channel.getUser();
-//                channel.sendMessage(messageContent.get(messageContent.size() - 1)).queue();
-//                System.out.printf("Message has been sent to %#s successfully\n", user);
-//                sent = true;
-//            } else {
-//                System.out.println("Channel creation for %#s failed!");
-//            }
-//        } while (sent=true);
-
-        // 🤓🤓 how are u gonna exit ctrl+c?
     }
 
 
