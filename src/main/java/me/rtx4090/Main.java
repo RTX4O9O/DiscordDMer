@@ -59,8 +59,8 @@ public class Main extends ListenerAdapter {
 
     private void spamUserPrivateChannel(User user) {
         if (user.isBot()) return;
-        
-        PrivateChannel channel = jda.openPrivateChannelById(user.getId()).completeAfter(1, TimeUnit.SECONDS);
+
+        Result<PrivateChannel> result = jda.openPrivateChannelById(user.getId()).mapToResult().completeAfter(1, TimeUnit.SECONDS);
         // waits for channel creation, and timeout after 1 second
 
         if (result.isFailure()) {
