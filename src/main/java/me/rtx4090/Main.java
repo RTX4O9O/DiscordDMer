@@ -32,7 +32,7 @@ public class Main extends ListenerAdapter {
 
     private void sendPrivateMessage() {
         boolean sent = false;
-        ArrayList<String> messageContent = new ArrayList<>();
+        final ArrayList<String> messageContent = new ArrayList<>();
         Scanner scanner = new Scanner(System.in);
         System.out.print("User ID: ");
         String recipientUserId = scanner.nextLine();
@@ -54,12 +54,11 @@ public class Main extends ListenerAdapter {
                 recipientUserId = scanner.nextLine();
 
                 System.out.print("Message: ");
-                messageContent = scanner.nextLine();
+                messageContent.add(scanner.nextLine());
 
-                String finalMessageContent = messageContent;
                 jda.openPrivateChannelById(recipientUserId).queue(channel -> {
                     User user = channel.getUser();
-                    channel.sendMessage(finalMessageContent).queue();
+                    channel.sendMessage(messageContent.get(messageContent.size()-1)).queue();
                     System.out.printf("Message has been sent to %#s successfully\n", user);
                     //sent = true;
                 });
