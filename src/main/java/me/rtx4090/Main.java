@@ -81,7 +81,7 @@ public class Main extends ListenerAdapter {
             System.out.println(sentMessage.getFailure().toString());
         }
     }
-    private void dm(Scanner scanner) {
+    private void dm() {
         Scanner scanner = new Scanner(System.in);
         System.out.print("User ID: ");
         String recipientUserId = scanner.nextLine();
