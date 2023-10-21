@@ -14,17 +14,19 @@ import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 
 public class Main extends ListenerAdapter {
+
     private JDA jda;
+    public String messageContent;
 
     public Main() {
         Scanner scanner = new Scanner(System.in);
-
         System.out.print("Discord Bot Token: ");
         String botToken = scanner.nextLine();
         jda = JDABuilder.createDefault(botToken)
                 .addEventListeners(this)
                 .enableIntents(GatewayIntent.GUILD_MEMBERS)
                 .build();
+
         while (true) {
             try{
                 jda.awaitReady();
@@ -48,9 +50,15 @@ public class Main extends ListenerAdapter {
         spamAllGuildMembers(guildId);
     }
 
+
+
     private void spamAllGuildMembers(String guildID) {
         Guild guild = jda.getGuildById(guildID);
         if (guild == null) return;
+
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Message: ");
+        messageContent = scanner.nextLine();
 
         List<Member> members = guild.loadMembers().get();
         for (Member member : members) {
@@ -72,7 +80,7 @@ public class Main extends ListenerAdapter {
         }
 
         PrivateChannel channel = result.get();
-        Result<Message> sentMessage = channel.sendMessage("abcabcabc").mapToResult().completeAfter(1, TimeUnit.SECONDS);
+        Result<Message> sentMessage = channel.sendMessage(messageContent).mapToResult().completeAfter(1, TimeUnit.SECONDS);
         // waits for message to send, and timeout after 1 second
         if (sentMessage.isSuccess()) {
             System.out.printf("Message has been sent to %#s successfully\n", user);
@@ -86,7 +94,7 @@ public class Main extends ListenerAdapter {
         System.out.print("User ID: ");
         String recipientUserId = scanner.nextLine();
         System.out.print("Message: ");
-        String messageContent = scanner.nextLine();
+        messageContent = scanner.nextLine();
 
         Result<PrivateChannel> result = jda.openPrivateChannelById(recipientUserId).mapToResult().completeAfter(1, TimeUnit.SECONDS);
         // waits for channel creation, and timeout after 1 second
