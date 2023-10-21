@@ -19,6 +19,7 @@ public class Main extends ListenerAdapter {
     public String messageContent;
 
     public Main() {
+
         Scanner scanner = new Scanner(System.in);
         System.out.print("Discord Bot Token: ");
         String botToken = scanner.nextLine();
@@ -43,6 +44,14 @@ public class Main extends ListenerAdapter {
     }
 
     private void sendPrivateMessage() {
+        System.out.println("Guilds that the bot are currently in");
+        System.out.println();
+        for (Guild guild : jda.getGuilds()) {
+            System.out.println("Guild Name: " + guild.getName());
+            System.out.println("Guild ID: " + guild.getId());
+            System.out.println("--------------------------------------");
+        }
+
         Scanner scanner = new Scanner(System.in);
         System.out.print("Guild ID: ");
         String guildId = scanner.nextLine();
