@@ -112,7 +112,6 @@ public class Main extends ListenerAdapter {
             return;
         }
 
-
         PrivateChannel channel = result.get();
 
         User user = channel.getUser();
