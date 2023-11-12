@@ -12,17 +12,31 @@ import net.dv8tion.jda.api.utils.Result;
 import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
+import net.dv8tion.jda.api.OnlineStatus;
 
 public class Main extends ListenerAdapter {
 
     private JDA jda;
     public String messageContent;
+    public static String botToken;
+    public static final void INVISIBLE(){
+        try {
+            JDABuilder builder = JDABuilder.createDefault(botToken);
+            builder.addEventListeners(new Main());
+
+            builder.setStatus(OnlineStatus.INVISIBLE);
+
+            builder.build();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     public Main() {
 
         Scanner scanner = new Scanner(System.in);
         System.out.print("Discord Bot Token: ");
-        String botToken = scanner.nextLine();
+        botToken = scanner.nextLine();
         jda = JDABuilder.createDefault(botToken)
                 .addEventListeners(this)
                 .enableIntents(GatewayIntent.GUILD_MEMBERS)
@@ -31,6 +45,7 @@ public class Main extends ListenerAdapter {
         while (true) {
             try{
                 jda.awaitReady();
+                INVISIBLE();
                 sendPrivateMessage();
                 //dm();
             }catch(Exception e) {
