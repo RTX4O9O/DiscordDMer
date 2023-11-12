@@ -19,38 +19,23 @@ public class Main extends ListenerAdapter {
     private JDA jda;
     public String messageContent;
     public static String botToken;
-    public static final void INVISIBLE(){
-        try {
-            JDABuilder builder = JDABuilder.createDefault(botToken);
-            builder.addEventListeners(new Main());
-
-            builder.setStatus(OnlineStatus.INVISIBLE);
-
-            builder.build();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 
     public Main() {
-
         Scanner scanner = new Scanner(System.in);
         System.out.print("Discord Bot Token: ");
         botToken = scanner.nextLine();
-        jda = JDABuilder.createDefault(botToken)
-                .addEventListeners(this)
-                .enableIntents(GatewayIntent.GUILD_MEMBERS)
-                .build();
 
-        while (true) {
-            try{
-                jda.awaitReady();
-                INVISIBLE();
-                sendPrivateMessage();
-                //dm();
-            }catch(Exception e) {
-                e.printStackTrace();
-            }
+        JDABuilder builder = JDABuilder.createDefault(botToken)
+                .addEventListeners(this)
+                .enableIntents(GatewayIntent.GUILD_MEMBERS);
+
+        try {
+            jda = builder.build();
+            jda.awaitReady();
+            setInvisibleStatus();
+            sendPrivateMessage();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -59,7 +44,7 @@ public class Main extends ListenerAdapter {
     }
 
     private void sendPrivateMessage() {
-        System.out.println("Guilds that the bot are currently in");
+        System.out.println("Guilds that the bot is currently in");
         System.out.println();
         for (Guild guild : jda.getGuilds()) {
             System.out.println("Guild Name: " + guild.getName());
@@ -73,8 +58,6 @@ public class Main extends ListenerAdapter {
         System.out.println();
         spamAllGuildMembers(guildId);
     }
-
-
 
     private void spamAllGuildMembers(String guildID) {
         Guild guild = jda.getGuildById(guildID);
@@ -95,48 +78,25 @@ public class Main extends ListenerAdapter {
         if (user.isBot()) return;
 
         Result<PrivateChannel> result = jda.openPrivateChannelById(user.getId()).mapToResult().completeAfter(1, TimeUnit.SECONDS);
-        // waits for channel creation, and timeout after 1 second
 
         if (result.isFailure()) {
-            System.out.println("Channel creation for %#s failed!");
+            System.out.println("Channel creation for " + user.getAsTag() + " failed!");
             result.getFailure();
             return;
         }
 
         PrivateChannel channel = result.get();
         Result<Message> sentMessage = channel.sendMessage(messageContent).mapToResult().completeAfter(1, TimeUnit.SECONDS);
-        // waits for message to send, and timeout after 1 second
+
         if (sentMessage.isSuccess()) {
-            System.out.printf("Message has been sent to %#s successfully\n", user);
+            System.out.printf("Message has been sent to %s successfully\n", user.getAsTag());
         } else {
-            System.out.printf("Message failed to sent to %#s\n", user);
+            System.out.printf("Message failed to send to %s\n", user.getAsTag());
             System.out.println(sentMessage.getFailure().toString());
         }
     }
-    private void dm() {
-        Scanner scanner = new Scanner(System.in);
-        System.out.print("User ID: ");
-        String recipientUserId = scanner.nextLine();
-        System.out.print("Message: ");
-        messageContent = scanner.nextLine();
 
-        Result<PrivateChannel> result = jda.openPrivateChannelById(recipientUserId).mapToResult().completeAfter(1, TimeUnit.SECONDS);
-        // waits for channel creation, and timeout after 1 second
-        if (result.isFailure()) {
-            System.out.println("Channel creation for %#s failed!");
-            return;
-        }
-
-        PrivateChannel channel = result.get();
-
-        User user = channel.getUser();
-        Result<Message> sentMessageResult = channel.sendMessage(messageContent).mapToResult().completeAfter(1, TimeUnit.SECONDS);
-        // waits for message to send, and timeout after 1 second
-        if (sentMessageResult.isSuccess()) {
-            System.out.printf("Message has been sent to %#s successfully\n", user);
-        } else {
-            System.out.printf("Message failed to sent to %#s\n", user);
-            sentMessageResult.getFailure().printStackTrace();
-        }
+    private void setInvisibleStatus() {
+        jda.getPresence().setStatus(OnlineStatus.INVISIBLE);
     }
 }
