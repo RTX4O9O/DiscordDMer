@@ -58,6 +58,7 @@ public class Main extends ListenerAdapter {
         String guildId = scanner.nextLine();
         System.out.println();
         spamAllGuildMembers(guildId);
+        sendPrivateMessage();
     }
 
     private void spamAllGuildMembers(String guildID) {
